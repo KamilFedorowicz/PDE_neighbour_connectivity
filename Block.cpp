@@ -3,8 +3,8 @@
 
 Block::Block(int _nx, int _ny, double _start_x, double _start_y, double _end_x, double _end_y): nx(_nx), ny(_ny), start_x(_start_x), start_y(_start_y), end_x(_end_x), end_y(_end_y)
 {
-    double dx = (end_x-start_x)/(nx-1);
-    double dy = (end_y-start_y)/(ny-1);
+    dx = (end_x-start_x)/(nx-1);
+    dy = (end_y-start_y)/(ny-1);
     
     for(int i=0; i<ny; i++)
     {

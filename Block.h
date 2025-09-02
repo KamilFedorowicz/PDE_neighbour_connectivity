@@ -22,6 +22,7 @@ public:
     
     void displayCells();
     
+    double dx, dy;
 private:
     
     int nx, ny;

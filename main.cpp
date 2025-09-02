@@ -1,27 +1,49 @@
 #include <iostream>
 #include "Block.h"
 #include "MultiBlock.h"
+#include "ScalarField.h"
 
 int main(int argc, const char * argv[]) {
     
-    // to do: get multiblock to work, then run all operations on it
-    // multiblock should work when connecting
+    // to do: impose BC (just fixed value for now)
+    // then introduce some diffrential operators and solve
     
-    int nx = 10;
-    int ny = 10;
-    double start_x=0;
-    double start_y=0;
-    double end_x=1;
-    double end_y=1;
+    int nx1 = 4;
+    int ny1 = 4;
+    double start_x1=0;
+    double start_y1=0;
+    double end_x1=1;
+    double end_y1=1;
     
-    Block block1(nx, ny, start_x, start_y, end_x, end_y);
-    Block block2(nx, ny, start_x+1, start_y, end_x+1, end_y);
-    // block1.displayCells();
+    Block block1(nx1, ny1, start_x1, start_y1, end_x1, end_y1);
     
-    Multiblock multiblock;
+    int nx2 = 4;
+    int ny2 = 4;
+    double start_x2=1;
+    double start_y2=0;
+    double end_x2=2;
+    double end_y2=1;
+    Block block2(nx2, ny2, start_x2, start_y2, end_x2, end_y2);
+    
+    int nx3 = 4;
+    int ny3 = 4;
+    double start_x3=0;
+    double start_y3=1;
+    double end_x3=1;
+    double end_y3=2;
+    Block block3(nx3, ny3, start_x3, start_y3, end_x3, end_y3);
+    
+    MultiBlock multiblock;
     multiblock.addBlock(block1);
-    multiblock.addBlock(block2);
+    std::cout << "Before" << std::endl;
     multiblock.displayCells();
+    std::cout << "After" << std::endl;
+    multiblock.addBlock(block2);
+    multiblock.addBlock(block3);
+    multiblock.displayCells();
+    
+    ScalarField scalarField(multiblock, 3.0);
+    scalarField.displayScalarField();
     
     // insert code here...
     std::cout << "Code ended!\n";

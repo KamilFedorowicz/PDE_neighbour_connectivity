@@ -1,33 +1,22 @@
 #pragma once
 #include "Block.h"
+#include <iomanip>
 
 // multiblock is always initialised empty. then as blocks are added to it, we fill in the cell info
-class Multiblock
+class MultiBlock
 {
 public:
-    Multiblock(){}; // always initialises an empty block
+    MultiBlock(); // always initialises an empty block
+    void addBlock(Block block);
+    void displayCells();
+    size_t multiBlockSize();
     
-    void addBlock(Block block)
-    {
-        for(Cell cell: block.blockCells)
-        {
-            cell.ID = cellID;
-            multiBlockCells.push_back(cell);
-            cellID++;
-        }
-    }
-    
-    void displayCells()
-    {
-        for(int i=0; i<multiBlockCells.size(); i++)
-        {
-            Cell cell = multiBlockCells[i];
-            std::cout << "ID: " << cell.ID << ", x: " << cell.x << ", y: " << cell.y << std::endl;
-        }
-    }
-
+    const std::vector<Cell> cellsInMultiblock();
     
 private:
     std::vector<Cell> multiBlockCells{};
+    std::vector<int> wallCellsIDs{};
     int cellID = 0;
+    double dx = 0.0; // set up cell sizes as 0. these will be changed
+    double dy = 0.0;
 };
