@@ -11,7 +11,9 @@ public:
     void displayCells();
     size_t multiBlockSize();
     
-    const std::vector<Cell> cellsInMultiblock();
+    std::vector<Cell>& getMultiBlockCells();
+    double get_dx() const;
+    double get_dy() const;
     
 private:
     std::vector<Cell> multiBlockCells{};

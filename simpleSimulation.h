@@ -1,0 +1,78 @@
+#pragma once
+#include "Block.h"
+#include "MultiBlock.h"
+#include "ScalarField.h"
+#include "Operators.h"
+#include "savingOutput.h"
+
+void runSimulation()
+{
+    int nx1 = 40;
+    int ny1 = 40;
+    double start_x1=0;
+    double start_y1=0;
+    double end_x1=1;
+    double end_y1=1;
+    
+    Block block1(nx1, ny1, start_x1, start_y1, end_x1, end_y1);
+    
+    int nx2 = nx1;
+    int ny2 = ny1;
+    double start_x2=1;
+    double start_y2=0;
+    double end_x2=2;
+    double end_y2=1;
+    Block block2(nx2, ny2, start_x2, start_y2, end_x2, end_y2);
+    
+    int nx3 = nx1;
+    int ny3 = ny1;
+    double start_x3=0;
+    double start_y3=1;
+    double end_x3=1;
+    double end_y3=2;
+    Block block3(nx3, ny3, start_x3, start_y3, end_x3, end_y3);
+    
+    MultiBlock multiblock;
+    multiblock.addBlock(block1);
+    multiblock.addBlock(block2);
+    multiblock.addBlock(block3);
+    
+    ScalarField scalarField(multiblock, 0.0);
+    
+    std::vector<double>& temperature = scalarField.getScalarValues();
+    std::vector<double> source(temperature.size(), 1);
+    
+    std::vector<Cell> multiBlockCells = multiblock.getMultiBlockCells();
+    std::vector<double> isBoundary{};
+    for(Cell cell: multiBlockCells)
+    {
+        if(cell.north==-1 || cell.south==-1 || cell.east==-1 || cell.west==-1)
+        {
+            source[cell.ID] = 0;
+            isBoundary.push_back(1);
+        }else{
+            isBoundary.push_back(0);
+        }
+        
+    }
+    std::cout << "Source: ";
+    print(source);
+    std::cout << std::endl;
+    
+    double dt = 1e-2;
+    double D = 1e-2;
+    for(int i=0; i<5000; i++)
+    {
+        std::vector<double> d_temperature_dt = D*Operators::compute(scalarField) + source;
+        temperature = temperature + dt*d_temperature_dt;
+    }
+    
+    std::vector<double>& temperature2 = scalarField.getScalarValues();
+    print(temperature2);
+    
+    std::string result1 = "/Users/Kamil/Desktop/cpp/work_udemy/PDE_solver_connectivity/PDE_solver_connectivity/result1.vtk";
+    saveToVTK(result1, scalarField);
+    
+}
+
+

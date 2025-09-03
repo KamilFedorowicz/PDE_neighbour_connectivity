@@ -31,10 +31,23 @@ void MultiBlock::addBlock(Block block)
             {
                 exists = true;
                 
-                if (cellInMultiblock.north == -1){cellInMultiblock.north = cell.north;}
-                if (cellInMultiblock.south == -1){cellInMultiblock.south = cell.south;}
-                if (cellInMultiblock.east == -1){cellInMultiblock.east = cell.east;}
-                if (cellInMultiblock.west == -1){cellInMultiblock.west = cell.west;}
+                if (cellInMultiblock.north == -1)
+                {
+                    cellInMultiblock.north = cell.north;
+
+                }
+                if (cellInMultiblock.south == -1)
+                {
+                    cellInMultiblock.south = cell.south;
+                }
+                if (cellInMultiblock.east == -1)
+                {
+                    cellInMultiblock.east = cell.east;
+                }
+                if (cellInMultiblock.west == -1)
+                {
+                    cellInMultiblock.west = cell.west;
+                }
 
                 break;
             }
@@ -78,7 +91,17 @@ size_t MultiBlock::multiBlockSize()
     return multiBlockCells.size();
 }
 
-const std::vector<Cell> MultiBlock::cellsInMultiblock()
+std::vector<Cell>& MultiBlock::getMultiBlockCells()
 {
     return multiBlockCells;
+}
+
+double MultiBlock::get_dx() const
+{
+    return dx;
+}
+
+double MultiBlock::get_dy() const
+{
+    return dy;
 }
