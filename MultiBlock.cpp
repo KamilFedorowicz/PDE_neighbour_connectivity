@@ -8,56 +8,88 @@ MultiBlock::MultiBlock(){}; // always initialises an empty block
     
 void MultiBlock::addBlock(Block block)
 {
-    // check if cell sizes are the same. this is just done for simplicity now
-    if(dx==0.0 && dy==0.0)
-    {
-        dx = block.dx;
-        dy = block.dy;
-    }
-    else if(block.dx!=dx || block.dy!=dy)
-    {
+    // 0) Consistent spacing
+    if (dx == 0.0 && dy == 0.0) { dx = block.dx; dy = block.dy; }
+    else if (block.dx != dx || block.dy != dy) {
         throw std::runtime_error("Incorrect cell sizes!");
     }
-    
-    for(Cell& cell: block.blockCells)
-    {
 
-        
+    // Map from block-local ID -> multiblock global ID
+    std::unordered_map<int, int> localToGlobal;
+
+    // 1) First pass: add new cells (DO NOT mutate IDs in the block)
+    for (const Cell& cell : block.blockCells)
+    {
         bool exists = false;
-        for(Cell& cellInMultiblock: multiBlockCells)
+
+        // Find by coordinates (O(N)); OK for now. (If needed, add a coord->ID map.)
+        for (const Cell& existing : multiBlockCells)
         {
-            // if cells have the same location, then they must be on the interface
-            if(cell.x == cellInMultiblock.x && cell.y == cellInMultiblock.y)
+            if (cell.x == existing.x && cell.y == existing.y)
             {
                 exists = true;
-                
-                if (cellInMultiblock.north == -1)
-                {
-                    cellInMultiblock.north = cell.north;
-
-                }
-                if (cellInMultiblock.south == -1)
-                {
-                    cellInMultiblock.south = cell.south;
-                }
-                if (cellInMultiblock.east == -1)
-                {
-                    cellInMultiblock.east = cell.east;
-                }
-                if (cellInMultiblock.west == -1)
-                {
-                    cellInMultiblock.west = cell.west;
-                }
-
+                // Local (block) cell maps to existing global ID
+                localToGlobal[cell.ID] = existing.ID;
                 break;
             }
-            
         }
-        
-        if(!exists)
+
+        if (!exists)
         {
-            cell.ID = cellID++; // overwrite cell ID only if this is a new cell
-            multiBlockCells.push_back(cell);
+            // Create a copy with a new global ID; DON'T change the block's cell
+            Cell copy = cell;
+            copy.ID = cellID++;                   // new global ID
+            multiBlockCells.push_back(copy);
+            localToGlobal[cell.ID] = copy.ID;     // map local->global
+        }
+    }
+
+    // 2) Second pass: wire neighbors using the map; set reverse links too
+    for (const Cell& cell : block.blockCells)
+    {
+        const int gID = localToGlobal[cell.ID];
+        Cell& gCell = multiBlockCells[gID]; // gCell is a multiblock representation of the cell
+
+        // North
+        if (cell.north != -1) // if the block cell had a north neighbour
+        {
+            auto it = localToGlobal.find(cell.north); // take the north index of a cell and find this index in the map
+            if (it != localToGlobal.end())
+            {
+                const int nID = it->second; // take the index of the north cell after mapping
+                gCell.north = nID; // assign the north id to the global cell
+                if (multiBlockCells[nID].south != gID) multiBlockCells[nID].south = gID; // set up backward connectivity
+            }
+        }
+
+        // South
+        if (cell.south != -1) {
+            auto it = localToGlobal.find(cell.south);
+            if (it != localToGlobal.end()) {
+                const int sID = it->second;
+                gCell.south = sID;
+                if (multiBlockCells[sID].north != gID) multiBlockCells[sID].north = gID;
+            }
+        }
+
+        // East
+        if (cell.east != -1) {
+            auto it = localToGlobal.find(cell.east);
+            if (it != localToGlobal.end()) {
+                const int eID = it->second;
+                gCell.east = eID;
+                if (multiBlockCells[eID].west != gID) multiBlockCells[eID].west = gID;
+            }
+        }
+
+        // West
+        if (cell.west != -1) {
+            auto it = localToGlobal.find(cell.west);
+            if (it != localToGlobal.end()) {
+                const int wID = it->second;
+                gCell.west = wID;
+                if (multiBlockCells[wID].east != gID) multiBlockCells[wID].east = gID;
+            }
         }
     }
 }

@@ -7,8 +7,8 @@
 
 void runSimulation()
 {
-    int nx1 = 40;
-    int ny1 = 40;
+    int nx1 = 10;
+    int ny1 = 10;
     double start_x1=0;
     double start_y1=0;
     double end_x1=1;
@@ -24,6 +24,7 @@ void runSimulation()
     double end_y2=1;
     Block block2(nx2, ny2, start_x2, start_y2, end_x2, end_y2);
     
+    
     int nx3 = nx1;
     int ny3 = ny1;
     double start_x3=0;
@@ -32,9 +33,16 @@ void runSimulation()
     double end_y3=2;
     Block block3(nx3, ny3, start_x3, start_y3, end_x3, end_y3);
     
+     
+    
     MultiBlock multiblock;
     multiblock.addBlock(block1);
+    std::cout << "Adding second block: " << std::endl;
+    multiblock.displayCells();
+    
     multiblock.addBlock(block2);
+    std::cout << "Adding second block: " << std::endl;
+    multiblock.displayCells();
     multiblock.addBlock(block3);
     
     ScalarField scalarField(multiblock, 0.0);
@@ -50,25 +58,25 @@ void runSimulation()
         {
             source[cell.ID] = 0;
             isBoundary.push_back(1);
-        }else{
+        }
+        else
+        {
             isBoundary.push_back(0);
         }
         
     }
-    std::cout << "Source: ";
-    print(source);
-    std::cout << std::endl;
+    
+    //std::cout << "Source: ";
+    //print(source);
+    //std::cout << std::endl;
     
     double dt = 1e-2;
     double D = 1e-2;
-    for(int i=0; i<5000; i++)
+    for(int i=0; i<10000; i++)
     {
         std::vector<double> d_temperature_dt = D*Operators::compute(scalarField) + source;
         temperature = temperature + dt*d_temperature_dt;
     }
-    
-    std::vector<double>& temperature2 = scalarField.getScalarValues();
-    print(temperature2);
     
     std::string result1 = "/Users/Kamil/Desktop/cpp/work_udemy/PDE_solver_connectivity/PDE_solver_connectivity/result1.vtk";
     saveToVTK(result1, scalarField);

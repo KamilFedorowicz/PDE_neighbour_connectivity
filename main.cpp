@@ -3,8 +3,8 @@
 
 int main(int argc, const char * argv[]) {
     
-    // to do: impose BC (just fixed value for now)
-    // then introduce some diffrential operators and solve
+    // to do: impose BC - zero gradient or fixed value (also handle inner corners
+    //
     
     runSimulation();
     
