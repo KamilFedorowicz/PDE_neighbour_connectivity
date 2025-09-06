@@ -4,11 +4,13 @@
 #include "ScalarField.h"
 #include "Operators.h"
 #include "savingOutput.h"
+#include "Wall.h"
+#include "FieldBC.h"
 
 void runSimulation()
 {
-    int nx1 = 10;
-    int ny1 = 10;
+    int nx1 = 3;
+    int ny1 = 3;
     double start_x1=0;
     double start_y1=0;
     double end_x1=1;
@@ -42,12 +44,12 @@ void runSimulation()
     
     multiblock.addBlock(block2);
     std::cout << "Adding second block: " << std::endl;
-    multiblock.displayCells();
     multiblock.addBlock(block3);
+    multiblock.displayCells();
     
     ScalarField scalarField(multiblock, 0.0);
     
-    std::vector<double>& temperature = scalarField.getScalarValues();
+    std::vector<double>& temperature = scalarField.getScalarValues(); // we can modify values through this
     std::vector<double> source(temperature.size(), 1);
     
     std::vector<Cell> multiBlockCells = multiblock.getMultiBlockCells();
@@ -66,10 +68,30 @@ void runSimulation()
         
     }
     
-    //std::cout << "Source: ";
-    //print(source);
-    //std::cout << std::endl;
+
+    Wall wallWest1;
+    wallWest1.addVerticalCells(multiblock, 0, 0, 2);
+    //wallWest1.displayCellIDs();
     
+    Wall wallEast1;
+    wallEast1.addVerticalCells(multiblock, 1, 1, 2);
+    Wall wallEast2;
+    wallEast2.addVerticalCells(multiblock, 2, 0, 1);
+    Wall wallNorth1;
+    wallNorth1.addHorizontalCells(multiblock, 0, 1, 2);
+    Wall wallNorth2;
+    wallNorth2.addHorizontalCells(multiblock, 1, 2, 1);
+    Wall wallSouth1;
+    wallSouth1.addHorizontalCells(multiblock, 0, 2, 0);
+    
+    
+    
+    
+    
+    
+    
+    
+    /*
     double dt = 1e-2;
     double D = 1e-2;
     for(int i=0; i<10000; i++)
@@ -80,6 +102,7 @@ void runSimulation()
     
     std::string result1 = "/Users/Kamil/Desktop/cpp/work_udemy/PDE_solver_connectivity/PDE_solver_connectivity/result1.vtk";
     saveToVTK(result1, scalarField);
+     */
     
 }
 
