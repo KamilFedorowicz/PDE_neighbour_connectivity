@@ -10,6 +10,19 @@ public:
     
     void solve(size_t steps, double _dt, std::map<std::string, FieldBC*> fieldBCs)
     {
+        
+        for(auto kv: fieldBCs)
+        {
+            auto fieldBC = kv.second;
+            
+            if(fieldBC->uninitialisedBC_cells()>0)
+            {
+                throw("Some cells are uninitialised! \n");
+            }
+        
+        }
+        
+        
         dt = _dt;
         for(size_t i=0; i<steps; i++)
         {

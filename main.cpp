@@ -4,6 +4,7 @@
 int main(int argc, const char * argv[]) {
     
     // to do: work on adding an equation class with multiple equations
+    // improve wall class to accept only wall cells
     
     runSimulation();
     

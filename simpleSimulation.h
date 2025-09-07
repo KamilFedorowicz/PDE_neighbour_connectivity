@@ -49,9 +49,9 @@ void runSimulation()
     //std::cout << "Added second block: " << std::endl;
     // multiblock.displayCells();
     
-    ScalarField scalarField(multiblock, 0.0);
+    ScalarField temperatureField(multiblock, 0.0);
     
-    std::vector<double>& temperature = scalarField.getScalarValues(); // we can modify values through this
+    std::vector<double>& temperature = temperatureField.getScalarValues(); // we can modify values through this
     std::vector<double> source(temperature.size(), 1);
     
     std::vector<Cell> multiBlockCells = multiblock.getMultiBlockCells();
@@ -73,31 +73,30 @@ void runSimulation()
     Wall wallSouth1;
     wallSouth1.addHorizontalCells(multiblock, 0, 2, 0);
     
-    FieldBC tempBC(multiblock);
     
+    FieldBC tempBC(multiblock);
     tempBC.addFixedValueWall(wallWest1, 0);
     tempBC.addFixedValueWall(wallEast1, 0);
-    //tempBC.addFixedValueWall(wallEast2, 0);
-    //tempBC.addFixedValueWall(wallNorth1, 0);
     tempBC.addFixedValueWall(wallNorth2, 0);
     tempBC.addFixedValueWall(wallSouth1, 0);
-    
     tempBC.addZeroGradientWall(wallNorth1);
     tempBC.addZeroGradientWall(wallEast2);
     
+    /*
     if(tempBC.uninitialisedBC_cells()>0)
     {
         throw("Some cells are uninitialised! \n");
     }
+     */
     
     double dt = 1e-2;
     double D = 1e-2;
-    size_t iterations = 10000;
+    size_t iterations = 2;
     
-    Equation01 eq(scalarField, D);
+    Equation01 eq(temperatureField, D);
 
     std::map<std::string, ScalarField*> scalarFieldMap;
-    scalarFieldMap["temperature"] = &scalarField;
+    scalarFieldMap["temperature"] = &temperatureField;
     Solver solver(eq, scalarFieldMap);
     
     std::map<std::string, FieldBC*> BC_map;
@@ -108,7 +107,7 @@ void runSimulation()
 
     
     std::string result1 = "/Users/Kamil/Desktop/cpp/work_udemy/PDE_solver_connectivity/PDE_solver_connectivity/result1.vtk";
-    saveToVTK(result1, scalarField);
+    saveToVTK(result1, temperatureField);
      
     
 }
