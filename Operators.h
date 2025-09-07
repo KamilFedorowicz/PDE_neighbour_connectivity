@@ -4,7 +4,7 @@
 namespace Operators
 {
 
-std::vector<double> compute(ScalarField scalarField)
+std::vector<double> Laplacian(ScalarField scalarField)
     {
     
     const std::vector<double>& scalarValues = scalarField.getScalarValues();

@@ -9,8 +9,8 @@
 
 void runSimulation()
 {
-    int nx1 = 3;
-    int ny1 = 3;
+    int nx1 = 20;
+    int ny1 = 20;
     double start_x1=0;
     double start_y1=0;
     double end_x1=1;
@@ -39,13 +39,13 @@ void runSimulation()
     
     MultiBlock multiblock;
     multiblock.addBlock(block1);
-    std::cout << "Adding second block: " << std::endl;
-    multiblock.displayCells();
+    //std::cout << "Added second block: " << std::endl;
+    // multiblock.displayCells();
     
     multiblock.addBlock(block2);
-    std::cout << "Adding second block: " << std::endl;
     multiblock.addBlock(block3);
-    multiblock.displayCells();
+    //std::cout << "Added second block: " << std::endl;
+    // multiblock.displayCells();
     
     ScalarField scalarField(multiblock, 0.0);
     
@@ -53,22 +53,9 @@ void runSimulation()
     std::vector<double> source(temperature.size(), 1);
     
     std::vector<Cell> multiBlockCells = multiblock.getMultiBlockCells();
-    std::vector<double> isBoundary{};
-    for(Cell cell: multiBlockCells)
-    {
-        if(cell.north==-1 || cell.south==-1 || cell.east==-1 || cell.west==-1)
-        {
-            source[cell.ID] = 0;
-            isBoundary.push_back(1);
-        }
-        else
-        {
-            isBoundary.push_back(0);
-        }
-        
-    }
-    
 
+
+    
     Wall wallWest1;
     wallWest1.addVerticalCells(multiblock, 0, 0, 2);
     //wallWest1.displayCellIDs();
@@ -84,25 +71,36 @@ void runSimulation()
     Wall wallSouth1;
     wallSouth1.addHorizontalCells(multiblock, 0, 2, 0);
     
+    FieldBC tempBC(multiblock);
     
+    tempBC.addFixedValueWall(wallWest1, 0);
+    tempBC.addFixedValueWall(wallEast1, 0);
+    //tempBC.addFixedValueWall(wallEast2, 0);
+    //tempBC.addFixedValueWall(wallNorth1, 0);
+    tempBC.addFixedValueWall(wallNorth2, 0);
+    tempBC.addFixedValueWall(wallSouth1, 0);
     
+    tempBC.addZeroGradientWall(wallNorth1);
+    tempBC.addZeroGradientWall(wallEast2);
     
+    if(tempBC.uninitialisedBC_cells()>0)
+    {
+        throw("Some cells are uninitialised! \n");
+    }
     
-    
-    
-    
-    /*
     double dt = 1e-2;
     double D = 1e-2;
-    for(int i=0; i<10000; i++)
+    for(int i=0; i<20000; i++)
     {
-        std::vector<double> d_temperature_dt = D*Operators::compute(scalarField) + source;
+        std::vector<double> d_temperature_dt = D*Operators::Laplacian(scalarField) + source;
         temperature = temperature + dt*d_temperature_dt;
+        tempBC.apply(scalarField);
     }
+    
     
     std::string result1 = "/Users/Kamil/Desktop/cpp/work_udemy/PDE_solver_connectivity/PDE_solver_connectivity/result1.vtk";
     saveToVTK(result1, scalarField);
-     */
+     
     
 }
 

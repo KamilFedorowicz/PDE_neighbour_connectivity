@@ -3,8 +3,7 @@
 
 int main(int argc, const char * argv[]) {
     
-    // to do: impose BC - zero gradient or fixed value (also handle inner corners
-    //
+    // to do: work on adding an equation class with multiple equations
     
     runSimulation();
     
