@@ -6,6 +6,8 @@
 #include "savingOutput.h"
 #include "Wall.h"
 #include "FieldBC.h"
+#include "Equation01.h"
+#include "Solver.h"
 
 void runSimulation()
 {
@@ -90,13 +92,20 @@ void runSimulation()
     
     double dt = 1e-2;
     double D = 1e-2;
-    for(int i=0; i<20000; i++)
-    {
-        std::vector<double> d_temperature_dt = D*Operators::Laplacian(scalarField) + source;
-        temperature = temperature + dt*d_temperature_dt;
-        tempBC.apply(scalarField);
-    }
+    size_t iterations = 10000;
     
+    Equation01 eq(scalarField, D);
+
+    std::map<std::string, ScalarField*> scalarFieldMap;
+    scalarFieldMap["temperature"] = &scalarField;
+    Solver solver(eq, scalarFieldMap);
+    
+    std::map<std::string, FieldBC*> BC_map;
+    BC_map["temperature"] = &tempBC;
+    
+    solver.solve(iterations, dt, BC_map);
+    
+
     
     std::string result1 = "/Users/Kamil/Desktop/cpp/work_udemy/PDE_solver_connectivity/PDE_solver_connectivity/result1.vtk";
     saveToVTK(result1, scalarField);
