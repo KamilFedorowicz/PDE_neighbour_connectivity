@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 
-void saveToVTK(const std::string& filename, ScalarField field)
+void saveToVTK(const std::string& filename, ScalarField field, std::string fieldName)
 {
     MultiBlock& multiblock = field.getMultiBlock();
     const std::vector<Cell>& cells = multiblock.getMultiBlockCells();
@@ -54,7 +54,7 @@ void saveToVTK(const std::string& filename, ScalarField field)
 
     // Write scalar data per cell
     vtkFile << "CELL_DATA " << cells.size() << "\n";
-    vtkFile << "SCALARS temperature float 1\n";
+    vtkFile << "SCALARS " << fieldName << " float 1\n";
     vtkFile << "LOOKUP_TABLE default\n";
     for (double val : values)
         vtkFile << val << "\n";

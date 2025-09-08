@@ -41,27 +41,23 @@ void runSimulation()
     
     MultiBlock multiblock;
     multiblock.addBlock(block1);
-    //std::cout << "Added second block: " << std::endl;
-    // multiblock.displayCells();
+
     
     multiblock.addBlock(block2);
     multiblock.addBlock(block3);
-    //std::cout << "Added second block: " << std::endl;
-    // multiblock.displayCells();
-    
+
+    // DEFINE TEMPERATURE FIELD
     ScalarField temperatureField(multiblock, 0.0);
-    
-    std::vector<double>& temperature = temperatureField.getScalarValues(); // we can modify values through this
-    std::vector<double> source(temperature.size(), 1);
+
+    // DEFINE PRESSURE FIELD
+    ScalarField pressureField(multiblock, 0.0);
+
     
     std::vector<Cell> multiBlockCells = multiblock.getMultiBlockCells();
-
-
     
+    // DEFINE WALLS
     Wall wallWest1;
     wallWest1.addVerticalCells(multiblock, 0, 0, 2);
-    //wallWest1.displayCellIDs();
-    
     Wall wallEast1;
     wallEast1.addVerticalCells(multiblock, 1, 1, 2);
     Wall wallEast2;
@@ -73,7 +69,7 @@ void runSimulation()
     Wall wallSouth1;
     wallSouth1.addHorizontalCells(multiblock, 0, 2, 0);
     
-    
+    // TEMPERATURE BC
     FieldBC tempBC(multiblock);
     tempBC.addFixedValueWall(wallWest1, 0);
     tempBC.addFixedValueWall(wallEast1, 0);
@@ -82,32 +78,39 @@ void runSimulation()
     tempBC.addZeroGradientWall(wallNorth1);
     tempBC.addZeroGradientWall(wallEast2);
     
-    /*
-    if(tempBC.uninitialisedBC_cells()>0)
-    {
-        throw("Some cells are uninitialised! \n");
-    }
-     */
+    // PRESSURE BC
+    FieldBC pressBC(multiblock);
+    pressBC.addFixedValueWall(wallWest1, 1);
+    pressBC.addFixedValueWall(wallEast1, 2);
+    pressBC.addFixedValueWall(wallNorth2, 3);
+    pressBC.addFixedValueWall(wallSouth1, 4);
+    pressBC.addZeroGradientWall(wallNorth1);
+    pressBC.addZeroGradientWall(wallEast2);
     
+    // DEFINE EQUATION CONSTANTS
     double dt = 1e-2;
-    double D = 1e-2;
-    size_t iterations = 2;
+    double D_temp = 1e-2;
+    size_t iterations = 1000;
     
-    Equation01 eq(temperatureField, D);
-
     std::map<std::string, ScalarField*> scalarFieldMap;
     scalarFieldMap["temperature"] = &temperatureField;
+    scalarFieldMap["pressure"] = &pressureField;
+    
+    Equation01 eq(scalarFieldMap, D_temp);
+
     Solver solver(eq, scalarFieldMap);
     
     std::map<std::string, FieldBC*> BC_map;
     BC_map["temperature"] = &tempBC;
+    BC_map["pressure"] = &pressBC;
     
     solver.solve(iterations, dt, BC_map);
     
-
+    std::string resultTemp = "/Users/Kamil/Desktop/cpp/work_udemy/PDE_solver_connectivity/PDE_solver_connectivity/resultTemp.vtk";
+    saveToVTK(resultTemp, temperatureField, "temperature");
     
-    std::string result1 = "/Users/Kamil/Desktop/cpp/work_udemy/PDE_solver_connectivity/PDE_solver_connectivity/result1.vtk";
-    saveToVTK(result1, temperatureField);
+    std::string resultPress = "/Users/Kamil/Desktop/cpp/work_udemy/PDE_solver_connectivity/PDE_solver_connectivity/resultPress.vtk";
+    saveToVTK(resultPress, pressureField, "pressure");
      
     
 }
