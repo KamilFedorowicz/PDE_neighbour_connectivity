@@ -7,9 +7,13 @@ MultiBlock::MultiBlock(){}; // always initialises an empty block
     
 void MultiBlock::addBlock(Block block)
 {
+    double epsilon = 1e-4;
+    std::cout << "difference 1: " << abs(block.dx - dx) << std::endl;
+    std::cout << "difference 2: " << abs(block.dy - dy) << std::endl;
+    
     // 0) Consistent spacing
     if (dx == 0.0 && dy == 0.0) { dx = block.dx; dy = block.dy; }
-    else if (block.dx != dx || block.dy != dy) {
+    else if ( abs(block.dx - dx) > epsilon || abs(block.dy - dy) > epsilon) {
         throw std::runtime_error("Incorrect cell sizes!");
     }
 

@@ -26,7 +26,7 @@ void saveToVTK(const std::string& filename, ScalarField field, std::string field
     vtkFile << "DATASET UNSTRUCTURED_GRID\n";
 
     // Generate points: 4 corners per cell
-    vtkFile << "POINTS " << cells.size() * 4 << " float\n";
+    vtkFile << "POINTS " << cells.size() * 4 << " double\n";
     for (const Cell& c : cells)
     {
         double x = c.x;
@@ -54,7 +54,7 @@ void saveToVTK(const std::string& filename, ScalarField field, std::string field
 
     // Write scalar data per cell
     vtkFile << "CELL_DATA " << cells.size() << "\n";
-    vtkFile << "SCALARS " << fieldName << " float 1\n";
+    vtkFile << "SCALARS " << fieldName << " double 1\n";
     vtkFile << "LOOKUP_TABLE default\n";
     for (double val : values)
         vtkFile << val << "\n";

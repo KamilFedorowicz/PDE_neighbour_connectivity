@@ -6,7 +6,7 @@
 class Solver
 {
 public:
-    Solver(EquationBase& eq, std::map<std::string, ScalarField*> _scalarFieldMap): equation(eq), scalarFieldMap(_scalarFieldMap) {}
+    Solver(EquationBase& eq): equation(eq), scalarFieldMap(eq.getScalarFieldMap()) {}
     
     void solve(size_t steps, double _dt, std::map<std::string, FieldBC*> fieldBCs)
     {

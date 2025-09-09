@@ -3,7 +3,8 @@
 
 int main(int argc, const char * argv[]) {
     
-    // to do: work on adding an equation class with multiple equations
+    // next: use QT?
+    // alternatively next: allow different cell sizes in two directions and when connecting grids
 
     
     runSimulation();

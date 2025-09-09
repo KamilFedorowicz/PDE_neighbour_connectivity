@@ -6,10 +6,12 @@
 class Equation01: public EquationBase
 {
 public:
-    Equation01(std::map<std::string, ScalarField*> _scalarFieldMap, double _D_temperature): scalarFieldMap(_scalarFieldMap), EquationBase(_scalarFieldMap.at("temperature")->getMultiBlock()), D_temperature(_D_temperature) // EquationBase needs multiblock to initialise
+    Equation01(std::map<std::string, ScalarField*> _scalarFieldMap, double _D_temperature, std::map<std::string, double> constantsMap): scalarFieldMap(_scalarFieldMap), EquationBase(_scalarFieldMap.at("temperature")->getMultiBlock()) // EquationBase needs multiblock to initialise
     {
         scalarFields["temperature"] = &scalarFieldMap.at("temperature")->getScalarValues();
         scalarFields["pressure"] = &scalarFieldMap.at("pressure")->getScalarValues() ;
+        D_temperature = constantsMap.at("temperature");
+        D_pressure = constantsMap.at("pressure");
 
     }
     
@@ -25,13 +27,16 @@ public:
         ScalarField* pressureFieldPtr = scalarFieldMap.at("pressure");
 
         std::vector<double> sourcePress(n_elements, 0.0); // add a source term with a unit value
-        dPressure_dt = D_temperature*Operators::Laplacian(*pressureFieldPtr) + sourcePress; // change D_pressure later
+        dPressure_dt = D_pressure*Operators::Laplacian(*pressureFieldPtr) + sourcePress; // change D_pressure later
         dScalarFields_dt["pressure"] = &dPressure_dt;
-        
-
-        
     }
 
+    
+    std::map<std::string, ScalarField*> getScalarFieldMap()
+    {
+        return scalarFieldMap;
+    }
+     
     
 private:
     

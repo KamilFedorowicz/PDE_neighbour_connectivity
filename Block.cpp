@@ -10,8 +10,6 @@ Block::Block(int _nx, int _ny, double _start_x, double _start_y, double _end_x, 
     {
         for(int j=0; j<nx; j++)
         {
-
-            
             Cell cell;
             
             cell.ID = i*nx + j;
