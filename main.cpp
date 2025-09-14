@@ -4,8 +4,6 @@
 int main(int argc, const char * argv[]) {
     
     // next: use QT?
-    // alternatively next: allow different cell sizes in two directions and when connecting grids
-
     
     runSimulation();
     

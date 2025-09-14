@@ -20,6 +20,7 @@ void runSimulation()
     
     Block block1(nx1, ny1, start_x1, start_y1, end_x1, end_y1);
     
+    // this block is on the east from the block1
     int nx2 = nx1;
     int ny2 = ny1;
     double start_x2=1;
@@ -28,7 +29,7 @@ void runSimulation()
     double end_y2=1;
     Block block2(nx2, ny2, start_x2, start_y2, end_x2, end_y2);
     
-    
+    // this block is on the north from block1
     int nx3 = nx1;
     int ny3 = 2*(ny1-1)+1; // need to use this to make sure that dy=(end_y-stary_x)/(ny-1) is the same
     double start_x3=0;
@@ -71,7 +72,7 @@ void runSimulation()
     tempBC.addFixedValueWall(wallEast1, 0);
     tempBC.addFixedValueWall(wallNorth2, 0);
     tempBC.addFixedValueWall(wallSouth1, 0);
-    tempBC.addZeroGradientWall(wallNorth1);
+    tempBC.addFixedValueWall(wallNorth1, 1);
     tempBC.addZeroGradientWall(wallEast2);
     
     // PRESSURE BC

@@ -10,8 +10,8 @@ void saveToVTK(const std::string& filename, ScalarField field, std::string field
     const std::vector<Cell>& cells = multiblock.getMultiBlockCells();
     std::vector<double>& values = field.getScalarValues();
 
-    double dx = multiblock.get_dx();
-    double dy = multiblock.get_dy();
+    // double dx = multiblock.get_dx();
+    // double dy = multiblock.get_dy();
 
     std::ofstream vtkFile(filename);
     if (!vtkFile.is_open())
@@ -29,14 +29,30 @@ void saveToVTK(const std::string& filename, ScalarField field, std::string field
     vtkFile << "POINTS " << cells.size() * 4 << " double\n";
     for (const Cell& c : cells)
     {
+        double left_dx = 0.0, right_dx = 0.0;
+        double down_dy = 0.0, up_dy = 0.0;
+
+        if (c.west != -1) {
+            left_dx = (c.x - cells[c.west].x) / 2.0;
+        }
+        if (c.east != -1) {
+            right_dx = (cells[c.east].x - c.x) / 2.0;
+        }
+        if (c.south != -1) {
+            down_dy = (c.y - cells[c.south].y) / 2.0;
+        }
+        if (c.north != -1) {
+            up_dy = (cells[c.north].y - c.y) / 2.0;
+        }
+        
         double x = c.x;
         double y = c.y;
 
         // corners in CCW order: SW, SE, NE, NW
-        vtkFile << x - dx/2 << " " << y - dy/2 << " 0.0\n"; // SW
-        vtkFile << x + dx/2 << " " << y - dy/2 << " 0.0\n"; // SE
-        vtkFile << x + dx/2 << " " << y + dy/2 << " 0.0\n"; // NE
-        vtkFile << x - dx/2 << " " << y + dy/2 << " 0.0\n"; // NW
+        vtkFile << x - left_dx  << " " << y - down_dy << " 0.0\n"; // SW
+        vtkFile << x + right_dx << " " << y - down_dy << " 0.0\n"; // SE
+        vtkFile << x + right_dx << " " << y + up_dy   << " 0.0\n"; // NE
+        vtkFile << x - left_dx  << " " << y + up_dy   << " 0.0\n"; // NW
     }
 
     // Write cells

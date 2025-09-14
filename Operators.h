@@ -13,17 +13,27 @@ std::vector<double> Laplacian(ScalarField scalarField)
     std::vector<double> result(scalarValues.size(),0);
     
     std::vector<Cell>& gridCells = multiBlock.getMultiBlockCells();
+    /*
     const double dx = multiBlock.get_dx();
     const double dy = multiBlock.get_dy();
+     */
     
     for(const Cell& cell: gridCells)
     {
         double d2x = 0;
         double d2y = 0;
         
-        // look at the cell only if it is not on the bountady
+        // look at the cell only if it is not on the boundary
         if(cell.north!=-1 && cell.south!=-1 && cell.east!=-1 && cell.west!=-1)
         {
+            Cell cellNorth = gridCells[cell.north];
+            Cell cellSouth = gridCells[cell.south];
+            Cell cellEast = gridCells[cell.east];
+            Cell cellWest = gridCells[cell.west];
+            
+            double dx = (cellEast.x - cellWest.x)/2;
+            double dy = (cellNorth.y - cellSouth.y)/2;
+            
             d2x = (scalarValues[cell.east] - 2*scalarValues[cell.ID] + scalarValues[cell.west])/(dx*dx);
             d2y = (scalarValues[cell.north] - 2*scalarValues[cell.ID] + scalarValues[cell.south])/(dy*dy);
         }

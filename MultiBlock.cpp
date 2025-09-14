@@ -10,17 +10,11 @@ void MultiBlock::addBlock(Block block)
     // check correct cell spacing
     checkConsistentGridSpacing(block);
     
-    double epsilon = 1e-4;
     std::cout << "difference 1: " << abs(block.dx - dx) << std::endl;
     std::cout << "difference 2: " << abs(block.dy - dy) << std::endl;
     
-    // 0) Consistent spacing
     if (dx == 0.0 && dy == 0.0) { dx = block.dx; dy = block.dy; }
-    /*
-    else if ( abs(block.dx - dx) > epsilon || abs(block.dy - dy) > epsilon) {
-        throw std::runtime_error("Incorrect cell sizes!");
-    }
-     */
+
 
     // Map from block-local ID -> multiblock global ID
     std::unordered_map<int, int> localToGlobal;
@@ -131,7 +125,8 @@ void MultiBlock::checkConsistentGridSpacing(Block block)
             // if two cells have the same locations
             if(multiBlockCell.x == newBlockWallCell.x && multiBlockCell.y == newBlockWallCell.y)
             {
-                // if two cells have a vertical boundary and are not in the corner (hence checking if north and south boundaries are not -1
+                // if two cells have a vertical boundary, multiblock on the left side, new block on the right side
+                // we are not checking corners (hence checking if north and south boundaries are not -1)
                 if(multiBlockCell.east == -1 && newBlockWallCell.west==-1 && multiBlockCell.north!=-1 && multiBlockCell.south!=-1 && newBlockWallCell.north!=-1 && newBlockWallCell.south!=-1)
                 {
                     // we just need to check if y values are the same
@@ -142,16 +137,76 @@ void MultiBlock::checkConsistentGridSpacing(Block block)
                     double newBlockWallCellY = newBlockCells[newBlockNorthCellID].y;
                     if(abs(multiBlockCellNorthY-newBlockWallCellY)<epsilon)
                     {
-                        std::cout << "Correct cell spacing on stitched walls \n";
+                        // correct cell spacing. the message is commented out
+                        // std::cout << "Correct cell spacing on stitched walls of the vertical boundary \n";
                     }
                     else
                     {
                         throw("Incorrect cell spacing! \n");
-                        std::cout << "Incorrect cell spacing!!!!!!!!! \n";
                     }
                 }
                 
+                // if two cells have a vertical boundary, multiblock on the right side, new block on the left side
+                if(multiBlockCell.west == -1 && newBlockWallCell.east==-1 && multiBlockCell.north!=-1 && multiBlockCell.south!=-1 && newBlockWallCell.north!=-1 && newBlockWallCell.south!=-1)
+                {
+                    // we just need to check if y values are the same
+                    // grids are uniform in x and y direction so we can just check either north or south value
+                    double multiBlockCellNorthY = multiBlockCells[multiBlockCell.north].y;
+                    Cell newBlockNorthCell = newBlockCells[newBlockWallCell.north];
+                    int newBlockNorthCellID = newBlockNorthCell.ID;
+                    double newBlockWallCellY = newBlockCells[newBlockNorthCellID].y;
+                    if(abs(multiBlockCellNorthY-newBlockWallCellY)<epsilon)
+                    {
+                        // correct cell spacing. the message is commented out
+                        // std::cout << "Correct cell spacing on stitched walls of the vertical boundary \n";
+                    }
+                    else
+                    {
+                        throw("Incorrect cell spacing! \n");
+                    }
+                }
                 
+                // if two cells have a horizontal boundary, multiblock on the bottom side, new block on the top side
+                if(multiBlockCell.north == -1 && newBlockWallCell.south==-1 && multiBlockCell.east!=-1 && multiBlockCell.west!=-1 && newBlockWallCell.east!=-1 && newBlockWallCell.west!=-1)
+                {
+                    // we just need to check if y values are the same
+                    // grids are uniform in x and y direction so we can just check either west or east value
+                    double multiBlockCellEastX = multiBlockCells[multiBlockCell.east].x;
+                    Cell newBlockEastCell = newBlockCells[newBlockWallCell.east];
+                    int newBlockEastCellID = newBlockEastCell.ID;
+                    double newBlockWallCellX = newBlockCells[newBlockEastCellID].x;
+                    if(abs(multiBlockCellEastX-newBlockWallCellX)<epsilon)
+                    {
+                        // correct cell spacing. the message is commented out
+                        // std::cout << "Correct cell spacing on stitched walls of the horizontal boundary \n";
+                    }
+                    else
+                    {
+                        throw("Incorrect cell spacing! \n");
+                    }
+                }
+                
+                // if two cells have a horizontal boundary, multiblock on the top side, new block on the bottom side
+                if(multiBlockCell.south == -1 && newBlockWallCell.north==-1 && multiBlockCell.east!=-1 && multiBlockCell.west!=-1 && newBlockWallCell.east!=-1 && newBlockWallCell.west!=-1)
+                {
+                    // we just need to check if y values are the same
+                    // grids are uniform in x and y direction so we can just check either west or east value
+                    double multiBlockCellEastX = multiBlockCells[multiBlockCell.east].x;
+                    Cell newBlockEastCell = newBlockCells[newBlockWallCell.east];
+                    int newBlockEastCellID = newBlockEastCell.ID;
+                    double newBlockWallCellX = newBlockCells[newBlockEastCellID].x;
+                    if(abs(multiBlockCellEastX-newBlockWallCellX)<epsilon)
+                    {
+                        // correct cell spacing. the message is commented out
+                        // std::cout << "Correct cell spacing on stitched walls of the horizontal boundary \n";
+                    }
+                    else
+                    {
+                        throw("Incorrect cell spacing! \n");
+                    }
+                }
+
+
                 
             }
         }
