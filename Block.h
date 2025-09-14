@@ -19,6 +19,7 @@ public:
     Block(int _nx, int _ny, double _start_x, double _start_y, double _end_x, double _end_y);
     
     std::vector<Cell> blockCells{};
+    std::vector<Cell> wallCells{}; // these are wall cells when a single block is created, but need not be wall cells in a multiblock
     
     void displayCells();
     

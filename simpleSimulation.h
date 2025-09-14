@@ -39,10 +39,9 @@ void runSimulation()
     
     MultiBlock multiblock;
     multiblock.addBlock(block1);
-
     multiblock.addBlock(block2);
     multiblock.addBlock(block3);
-    multiblock.displayCells();
+    //multiblock.displayCells();
 
     // DEFINE TEMPERATURE FIELD
     ScalarField temperatureField(multiblock, 0.0);

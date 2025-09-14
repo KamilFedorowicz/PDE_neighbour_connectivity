@@ -51,6 +51,12 @@ Block::Block(int _nx, int _ny, double _start_x, double _start_y, double _end_x, 
             {
                 cell.north = cell.ID + nx;
             }
+            
+            if(cell.east==-1 || cell.west==-1 || cell.north==-1 || cell.south==-1)
+            {
+                wallCells.push_back(cell);
+            }
+            
             blockCells.push_back(cell);
         }
     }

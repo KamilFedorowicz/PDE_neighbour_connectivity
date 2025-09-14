@@ -15,6 +15,9 @@ public:
     double get_dx() const;
     double get_dy() const;
     
+    void checkConsistentGridSpacing(Block block);
+    void resetAndUpdateWallCells();
+    
 private:
     std::vector<Cell> multiBlockCells{};
     std::vector<int> wallCellsIDs{};

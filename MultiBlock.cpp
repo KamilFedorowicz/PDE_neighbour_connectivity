@@ -7,15 +7,20 @@ MultiBlock::MultiBlock(){}; // always initialises an empty block
     
 void MultiBlock::addBlock(Block block)
 {
+    // check correct cell spacing
+    checkConsistentGridSpacing(block);
+    
     double epsilon = 1e-4;
     std::cout << "difference 1: " << abs(block.dx - dx) << std::endl;
     std::cout << "difference 2: " << abs(block.dy - dy) << std::endl;
     
     // 0) Consistent spacing
     if (dx == 0.0 && dy == 0.0) { dx = block.dx; dy = block.dy; }
+    /*
     else if ( abs(block.dx - dx) > epsilon || abs(block.dy - dy) > epsilon) {
         throw std::runtime_error("Incorrect cell sizes!");
     }
+     */
 
     // Map from block-local ID -> multiblock global ID
     std::unordered_map<int, int> localToGlobal;
@@ -61,6 +66,7 @@ void MultiBlock::addBlock(Block block)
             {
                 const int nID = it->second; // take the index of the north cell after mapping
                 gCell.north = nID; // assign the north id to the global cell
+                
                 if (multiBlockCells[nID].south != gID) multiBlockCells[nID].south = gID; // set up backward connectivity
             }
         }
@@ -95,9 +101,64 @@ void MultiBlock::addBlock(Block block)
             }
         }
     }
+    
+    resetAndUpdateWallCells();
 }
 
+void MultiBlock::resetAndUpdateWallCells()
+{
+    wallCellsIDs = {};
+    for(Cell cell: multiBlockCells)
+    {
+        if(cell.north==-1 || cell.south==-1 || cell.east==-1 || cell.west==-1)
+        {
+            wallCellsIDs.push_back(cell.ID);
+        }
+    }
+}
 
+void MultiBlock::checkConsistentGridSpacing(Block block)
+{
+    //std::cout << "entering the function \n";
+    double epsilon = 1e-5;
+    std::vector<Cell> newBlockWallCells = block.wallCells;
+    std::vector<Cell> newBlockCells = block.blockCells;
+    for(Cell newBlockWallCell: newBlockWallCells)
+    {
+        for(int wallCellsID: wallCellsIDs)
+        {
+            Cell multiBlockCell = multiBlockCells[wallCellsID];
+            // if two cells have the same locations
+            if(multiBlockCell.x == newBlockWallCell.x && multiBlockCell.y == newBlockWallCell.y)
+            {
+                // if two cells have a vertical boundary and are not in the corner (hence checking if north and south boundaries are not -1
+                if(multiBlockCell.east == -1 && newBlockWallCell.west==-1 && multiBlockCell.north!=-1 && multiBlockCell.south!=-1 && newBlockWallCell.north!=-1 && newBlockWallCell.south!=-1)
+                {
+                    // we just need to check if y values are the same
+                    // grids are uniform in x and y direction so we can just check either north or south value
+                    double multiBlockCellNorthY = multiBlockCells[multiBlockCell.north].y;
+                    Cell newBlockNorthCell = newBlockCells[newBlockWallCell.north];
+                    int newBlockNorthCellID = newBlockNorthCell.ID;
+                    double newBlockWallCellY = newBlockCells[newBlockNorthCellID].y;
+                    if(abs(multiBlockCellNorthY-newBlockWallCellY)<epsilon)
+                    {
+                        std::cout << "Correct cell spacing on stitched walls \n";
+                    }
+                    else
+                    {
+                        throw("Incorrect cell spacing! \n");
+                        std::cout << "Incorrect cell spacing!!!!!!!!! \n";
+                    }
+                }
+                
+                
+                
+            }
+        }
+        
+    }
+    
+}
 
 void MultiBlock::displayCells()
 {
